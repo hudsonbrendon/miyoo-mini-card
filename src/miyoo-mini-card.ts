@@ -13,6 +13,7 @@ import type {
   ResolvedEntities,
   StatConfig,
 } from "./types";
+import "./editor";
 
 console.info(
   `%c MIYOO-MINI-CARD %c v${CARD_VERSION} `,
@@ -64,6 +65,10 @@ export class MiyooMiniCard extends LitElement {
 
   getCardSize(): number {
     return 5;
+  }
+
+  static getConfigElement(): HTMLElement {
+    return document.createElement("miyoo-mini-card-editor");
   }
 
   static getStubConfig(): MiyooMiniCardConfig {
