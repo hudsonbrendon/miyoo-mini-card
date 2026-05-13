@@ -1,0 +1,17 @@
+export const en: Record<string, string> = {
+  "state.playing": "Playing",
+  "state.standby": "Standby",
+  "mode.mainui": "In menu",
+  "mode.switcher": "Game switcher",
+  "mode.apps": "In an app",
+  "mode.advmenu": "Advanced menu",
+  "mode.drastic": "DraStic running",
+  "mode.launching": "Launching",
+  "stat.battery": "Battery",
+  "stat.volume": "Volume",
+  "stat.brightness": "Brightness",
+  "stat.temperature": "Temperature",
+  "stat.wifi": "Wi-Fi",
+  "stat.playtime_today": "Today",
+  "stat.ram": "RAM",
+};

@@ -1,0 +1,17 @@
+export const ptBR: Record<string, string> = {
+  "state.playing": "Jogando",
+  "state.standby": "Em standby",
+  "mode.mainui": "No menu",
+  "mode.switcher": "Game switcher",
+  "mode.apps": "Em um app",
+  "mode.advmenu": "Menu avançado",
+  "mode.drastic": "Rodando DraStic",
+  "mode.launching": "Carregando",
+  "stat.battery": "Bateria",
+  "stat.volume": "Volume",
+  "stat.brightness": "Brilho",
+  "stat.temperature": "Temperatura",
+  "stat.wifi": "Wi-Fi",
+  "stat.playtime_today": "Hoje",
+  "stat.ram": "RAM",
+};
