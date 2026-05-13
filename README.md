@@ -67,10 +67,11 @@ stats:                   # up to 4
   - entity: playtime_today_min
     suffix: " min"
     subtitle: stat.playtime_today
-# Optional per-entity overrides (when HA renamed something)
-entities:
-  battery: sensor.miyoo_main_battery
-  charging: binary_sensor.miyoo_main_charging
+# Optional per-entity overrides — only set these if HA renamed something
+# in your install. The auto-prefix above already produces
+# `sensor.<prefix>_miyoo_<key>`, matching the names MQTT Discovery creates.
+# entities:
+#   battery: sensor.custom_battery_id
 ```
 
 ### Stat entities supported

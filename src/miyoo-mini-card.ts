@@ -98,12 +98,21 @@ export class MiyooMiniCard extends LitElement {
 
     const stateLine = computeStateLine(this.hass, resolved, lang);
 
-    const screenLine1 = modeState === "game" && resolved.game
-      ? (this.hass.states[resolved.game]?.state || localize("state.standby", lang))
-      : localize(`mode.${modeState ?? ""}`, lang) || localize("state.standby", lang);
-    const screenLine2 = resolved.core && this.hass.states[resolved.core]?.state
-      ? String(this.hass.states[resolved.core].state).toUpperCase()
-      : "";
+    const KNOWN_MODES = new Set(["mainui", "switcher", "apps", "advmenu", "drastic", "launching"]);
+    let screenLine1: string;
+    let screenLine2 = "";
+    if (modeState === "game" && resolved.game) {
+      const g = this.hass.states[resolved.game]?.state;
+      screenLine1 = g && g !== "unknown" && g !== "unavailable" ? g : localize("state.standby", lang);
+      const c = resolved.core ? this.hass.states[resolved.core]?.state : undefined;
+      if (c && c !== "unknown" && c !== "unavailable") {
+        screenLine2 = String(c).toUpperCase();
+      }
+    } else if (modeState && KNOWN_MODES.has(modeState)) {
+      screenLine1 = localize(`mode.${modeState}`, lang);
+    } else {
+      screenLine1 = localize("state.standby", lang);
+    }
 
     const stats = (this._config.stats ?? DEFAULT_STATS).slice(0, 4);
 

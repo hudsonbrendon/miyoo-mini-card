@@ -35,7 +35,7 @@ export const cardStyles = css`
   }
   .mmc-svg-wrap svg {
     width: 100%;
-    max-width: 360px;
+    max-width: 280px;
     height: auto;
   }
   .mmc-stats {
@@ -59,14 +59,15 @@ export const cardStyles = css`
     margin-top: 2px;
   }
   .mmc-screen-text {
-    font: 600 18px sans-serif;
+    font: 700 16px sans-serif;
     fill: #fff;
     text-anchor: middle;
     dominant-baseline: middle;
   }
   .mmc-screen-sub {
-    font: 400 11px sans-serif;
-    fill: #9aa;
+    font: 500 11px sans-serif;
+    fill: #94a3b8;
     text-anchor: middle;
+    letter-spacing: 1px;
   }
 `;

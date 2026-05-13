@@ -3,10 +3,13 @@ import { resolveEntities } from "../src/helpers/resolve-entities";
 import { ENTITY_KEYS } from "../src/const";
 
 describe("resolveEntities", () => {
-  it("derives every key from the prefix when no overrides are given", () => {
+  it("derives every key from the prefix with HA's miyoo_ infix", () => {
     const out = resolveEntities({ type: "x", entity: "miyoo_main" });
     for (const k of ENTITY_KEYS) {
-      const expected = k === "charging" ? `binary_sensor.miyoo_main_${k}` : `sensor.miyoo_main_${k}`;
+      const expected =
+        k === "charging"
+          ? `binary_sensor.miyoo_main_miyoo_${k}`
+          : `sensor.miyoo_main_miyoo_${k}`;
       expect(out[k]).toBe(expected);
     }
   });
@@ -19,7 +22,7 @@ describe("resolveEntities", () => {
     });
     expect(out.battery).toBe("sensor.custom_battery");
     expect(out.game).toBe("sensor.custom_game");
-    expect(out.volume).toBe("sensor.miyoo_main_volume");
+    expect(out.volume).toBe("sensor.miyoo_main_miyoo_volume");
   });
 
   it("works with only overrides (no prefix)", () => {
