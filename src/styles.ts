@@ -159,27 +159,4 @@ export const cardStyles = css`
     margin-top: 2px;
   }
 
-  /* ── Action bar at bottom ─────────────────────────────────────────── */
-  .mmc-actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 2px 6px;
-  }
-  .mmc-actions .group {
-    display: flex;
-    gap: 18px;
-    align-items: center;
-  }
-  .mmc-actions ha-icon {
-    --mdc-icon-size: 22px;
-    color: var(--mmc-muted);
-    cursor: default;
-    transition: color 0.18s ease;
-  }
-  .mmc-actions ha-icon.active { color: var(--mmc-fg); }
-  .mmc-actions ha-icon.warn   { color: #fbbf24; }
-  .mmc-actions ha-icon.good   { color: #22c55e; }
-  .mmc-actions ha-icon.bad    { color: #ef4444; }
-
 `;

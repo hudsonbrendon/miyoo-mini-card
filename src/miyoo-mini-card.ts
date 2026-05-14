@@ -119,15 +119,6 @@ export class MiyooMiniCard extends LitElement {
     return "mdi:volume-high";
   }
 
-  private _wifiIcon(rssi: number | undefined): string {
-    if (rssi === undefined) return "mdi:wifi-off";
-    if (rssi >= -55) return "mdi:wifi-strength-4";
-    if (rssi >= -65) return "mdi:wifi-strength-3";
-    if (rssi >= -75) return "mdi:wifi-strength-2";
-    if (rssi >= -85) return "mdi:wifi-strength-1";
-    return "mdi:wifi-strength-outline";
-  }
-
   render(): TemplateResult | typeof nothing {
     if (!this._config || !this.hass) return nothing;
     const resolved = resolveEntities(this._config);
@@ -142,12 +133,6 @@ export class MiyooMiniCard extends LitElement {
     const batteryPct = this._intState(resolved.battery);
     const volPct = this._intState(resolved.volume);
     const playtimeMin = this._intState(resolved["playtime_today_min" as keyof ResolvedEntities]);
-    const rssi = this._intState(resolved.wifi_rssi);
-    const muteState = this.hass.states[`binary_sensor.${this._config.entity}_miyoo_mute`]?.state;
-    const isMuted = muteState === "on" || muteState === "ON";
-    const ntpState = this.hass.states[`binary_sensor.${this._config.entity}_miyoo_ntp_synced`]?.state;
-    const ntpSynced = ntpState === "on" || ntpState === "ON";
-
     const stateLine = computeStateLine(this.hass, resolved, lang);
     const inGame = modeState === "game";
 
@@ -216,19 +201,6 @@ export class MiyooMiniCard extends LitElement {
               </div>
             `;
           })}
-        </div>
-
-        <!-- Action bar: state indicators -->
-        <div class="mmc-actions">
-          <div class="group">
-            <ha-icon icon="mdi:refresh" title="refresh"></ha-icon>
-            <ha-icon icon="${inGame ? "mdi:gamepad-square" : "mdi:home"}" class="active" title="mode"></ha-icon>
-          </div>
-          <div class="group">
-            <ha-icon icon="${this._wifiIcon(rssi)}" class="${rssi !== undefined ? "active" : ""}" title="wifi"></ha-icon>
-            <ha-icon icon="${ntpSynced ? "mdi:clock-check" : "mdi:clock-alert-outline"}" class="${ntpSynced ? "good" : ""}" title="ntp"></ha-icon>
-            <ha-icon icon="${isMuted ? "mdi:volume-off" : "mdi:volume-high"}" class="${isMuted ? "bad" : ""}" title="mute"></ha-icon>
-          </div>
         </div>
       </ha-card>
     `;
