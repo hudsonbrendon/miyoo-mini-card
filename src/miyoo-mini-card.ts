@@ -2,7 +2,7 @@ import { LitElement, html, nothing, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { CARD_NAME, CARD_VERSION } from "./const";
 import { cardStyles } from "./styles";
-import { miyooSvg } from "./assets/miyoo-svg";
+import { miyooDevice } from "./assets/miyoo-device";
 import { resolveEntities } from "./helpers/resolve-entities";
 import { computeStateLine } from "./helpers/compute-state-line";
 import { formatStat } from "./helpers/format-stat";
@@ -191,7 +191,7 @@ export class MiyooMiniCard extends LitElement {
 
         <!-- Device illustration -->
         <div class="mmc-device">
-          ${miyooSvg({ screenLine1, screenLine2, charging: isCharging })}
+          ${miyooDevice({ screenLine1, screenLine2, charging: isCharging })}
         </div>
 
         <!-- Name + status -->

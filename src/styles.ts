@@ -42,16 +42,69 @@ export const cardStyles = css`
     padding: 0 4px;
   }
 
-  /* ── Device illustration ──────────────────────────────────────────── */
+  /* ── Device illustration (photo + screen overlay + charging LED) ─── */
   .mmc-device {
     display: flex;
     justify-content: center;
     margin: 4px 0 6px;
   }
-  .mmc-device svg {
+  .mmc-photo {
+    position: relative;
     width: 100%;
-    max-width: 280px;
+    max-width: 260px;
+    line-height: 0;
+  }
+  .mmc-photo-img {
+    width: 100%;
     height: auto;
+    display: block;
+  }
+  /* Overlay positioned over the screen region of the photo.
+     Tuned for the cropped 218×300 product shot. */
+  .mmc-screen-overlay {
+    position: absolute;
+    top: 7.5%;
+    bottom: 53%;
+    left: 14%;
+    right: 14%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    line-height: 1.2;
+  }
+  .mmc-screen-line1 {
+    color: #fff;
+    font: 700 14px sans-serif;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .mmc-screen-line2 {
+    color: #94a3b8;
+    font: 500 10px sans-serif;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+  .mmc-led-charging {
+    position: absolute;
+    top: 2.5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 6px #22c55e, 0 0 10px #22c55e;
+    animation: mmc-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes mmc-pulse {
+    0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+    50%      { opacity: 1.0; transform: translateX(-50%) scale(1.3); }
   }
 
   /* ── Device name + status line ────────────────────────────────────── */
@@ -127,17 +180,4 @@ export const cardStyles = css`
   .mmc-actions ha-icon.good   { color: #22c55e; }
   .mmc-actions ha-icon.bad    { color: #ef4444; }
 
-  /* ── SVG screen text classes (used inside miyoo-svg) ──────────────── */
-  .mmc-screen-text {
-    font: 700 16px sans-serif;
-    fill: #fff;
-    text-anchor: middle;
-    dominant-baseline: middle;
-  }
-  .mmc-screen-sub {
-    font: 500 11px sans-serif;
-    fill: #94a3b8;
-    text-anchor: middle;
-    letter-spacing: 1px;
-  }
 `;
