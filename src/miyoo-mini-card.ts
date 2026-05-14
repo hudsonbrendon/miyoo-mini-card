@@ -85,6 +85,49 @@ export class MiyooMiniCard extends LitElement {
     return id;
   }
 
+  private _intState(entityId: string | undefined): number | undefined {
+    if (!entityId || !this.hass) return undefined;
+    const s = this.hass.states[entityId]?.state;
+    if (!s || s === "unknown" || s === "unavailable") return undefined;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : undefined;
+  }
+
+  private _batteryIcon(pct: number | undefined, charging: boolean): string {
+    if (pct === undefined) return "mdi:battery-unknown";
+    if (charging) {
+      if (pct >= 90) return "mdi:battery-charging-100";
+      if (pct >= 70) return "mdi:battery-charging-80";
+      if (pct >= 50) return "mdi:battery-charging-60";
+      if (pct >= 30) return "mdi:battery-charging-40";
+      if (pct >= 10) return "mdi:battery-charging-20";
+      return "mdi:battery-charging-outline";
+    }
+    if (pct >= 95) return "mdi:battery";
+    if (pct >= 80) return "mdi:battery-80";
+    if (pct >= 60) return "mdi:battery-60";
+    if (pct >= 40) return "mdi:battery-40";
+    if (pct >= 20) return "mdi:battery-20";
+    return "mdi:battery-alert";
+  }
+
+  private _volumeIcon(vol: number | undefined): string {
+    if (vol === undefined) return "mdi:volume-off";
+    if (vol <= 0) return "mdi:volume-mute";
+    if (vol < 33) return "mdi:volume-low";
+    if (vol < 66) return "mdi:volume-medium";
+    return "mdi:volume-high";
+  }
+
+  private _wifiIcon(rssi: number | undefined): string {
+    if (rssi === undefined) return "mdi:wifi-off";
+    if (rssi >= -55) return "mdi:wifi-strength-4";
+    if (rssi >= -65) return "mdi:wifi-strength-3";
+    if (rssi >= -75) return "mdi:wifi-strength-2";
+    if (rssi >= -85) return "mdi:wifi-strength-1";
+    return "mdi:wifi-strength-outline";
+  }
+
   render(): TemplateResult | typeof nothing {
     if (!this._config || !this.hass) return nothing;
     const resolved = resolveEntities(this._config);
@@ -96,12 +139,22 @@ export class MiyooMiniCard extends LitElement {
       : undefined;
     const isCharging = chargingState === "on" || chargingState === "ON";
 
+    const batteryPct = this._intState(resolved.battery);
+    const volPct = this._intState(resolved.volume);
+    const playtimeMin = this._intState(resolved["playtime_today_min" as keyof ResolvedEntities]);
+    const rssi = this._intState(resolved.wifi_rssi);
+    const muteState = this.hass.states[`binary_sensor.${this._config.entity}_miyoo_mute`]?.state;
+    const isMuted = muteState === "on" || muteState === "ON";
+    const ntpState = this.hass.states[`binary_sensor.${this._config.entity}_miyoo_ntp_synced`]?.state;
+    const ntpSynced = ntpState === "on" || ntpState === "ON";
+
     const stateLine = computeStateLine(this.hass, resolved, lang);
+    const inGame = modeState === "game";
 
     const KNOWN_MODES = new Set(["mainui", "switcher", "apps", "advmenu", "drastic", "launching"]);
     let screenLine1: string;
     let screenLine2 = "";
-    if (modeState === "game" && resolved.game) {
+    if (inGame && resolved.game) {
       const g = this.hass.states[resolved.game]?.state;
       screenLine1 = g && g !== "unknown" && g !== "unavailable" ? g : localize("state.standby", lang);
       const c = resolved.core ? this.hass.states[resolved.core]?.state : undefined;
@@ -118,14 +171,40 @@ export class MiyooMiniCard extends LitElement {
 
     return html`
       <ha-card>
-        ${this._config.name ? html`<div class="mmc-title">${this._config.name}</div>` : nothing}
-        <div class="mmc-state-line">
-          ${stateLine}
-          ${isCharging ? html`<span class="charging">⚡</span>` : nothing}
+        <!-- Header: 3 status badges + kebab -->
+        <div class="mmc-header">
+          <span class="badge">
+            <ha-icon icon="${this._volumeIcon(volPct)}"></ha-icon>
+            ${volPct ?? "—"}%
+          </span>
+          <span class="badge">
+            <ha-icon icon="${this._batteryIcon(batteryPct, isCharging)}"></ha-icon>
+            ${batteryPct ?? "—"}%
+          </span>
+          <span class="badge">
+            <ha-icon icon="mdi:clock-outline"></ha-icon>
+            ${playtimeMin ?? 0}m
+          </span>
+          <span class="spacer"></span>
+          <span class="menu-dot">⋮</span>
         </div>
-        <div class="mmc-svg-wrap">
+
+        <!-- Device illustration -->
+        <div class="mmc-device">
           ${miyooSvg({ screenLine1, screenLine2, charging: isCharging })}
         </div>
+
+        <!-- Name + status -->
+        ${this._config.name
+          ? html`<div class="mmc-name">${this._config.name}</div>`
+          : nothing}
+        <div class="mmc-status">
+          ${inGame ? html`<span class="play-icon">▶</span>` : nothing}
+          ${stateLine}
+          ${isCharging ? html`<span class="charging-icon">⚡</span>` : nothing}
+        </div>
+
+        <!-- Stats grid -->
         <div class="mmc-stats">
           ${stats.map((s) => {
             const id = this._resolveStatEntity(s.entity, resolved);
@@ -137,6 +216,19 @@ export class MiyooMiniCard extends LitElement {
               </div>
             `;
           })}
+        </div>
+
+        <!-- Action bar: state indicators -->
+        <div class="mmc-actions">
+          <div class="group">
+            <ha-icon icon="mdi:refresh" title="refresh"></ha-icon>
+            <ha-icon icon="${inGame ? "mdi:gamepad-square" : "mdi:home"}" class="active" title="mode"></ha-icon>
+          </div>
+          <div class="group">
+            <ha-icon icon="${this._wifiIcon(rssi)}" class="${rssi !== undefined ? "active" : ""}" title="wifi"></ha-icon>
+            <ha-icon icon="${ntpSynced ? "mdi:clock-check" : "mdi:clock-alert-outline"}" class="${ntpSynced ? "good" : ""}" title="ntp"></ha-icon>
+            <ha-icon icon="${isMuted ? "mdi:volume-off" : "mdi:volume-high"}" class="${isMuted ? "bad" : ""}" title="mute"></ha-icon>
+          </div>
         </div>
       </ha-card>
     `;
