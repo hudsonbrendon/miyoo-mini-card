@@ -4,11 +4,14 @@ Home Assistant Lovelace card for the **Miyoo Mini Plus** running
 [OnionOS](https://onionui.github.io/), paired with
 [`miyoo-mqtt-reporter`](https://github.com/hudsonbrendon/miyoo-mqtt-reporter).
 
-Displays an inline SVG of the device with the currently running game on the
+Shows the real device photo with the currently running game overlaid on the
 screen, a state line, and a 4-cell stat grid (battery / volume / temperature
-/ playtime today by default — fully configurable).
+/ playtime today by default — fully configurable). Live state indicators
+(WiFi / NTP / mute) sit in a bottom action bar.
 
-![Card preview](assets/card-preview.png)
+<p align="center">
+  <img src="assets/card-preview.png" alt="Miyoo Mini Card preview" width="420" />
+</p>
 
 ## Requirements
 
