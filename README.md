@@ -10,7 +10,7 @@ screen, a state line, and a 4-cell stat grid (battery / volume / temperature
 (WiFi / NTP / mute) sit in a bottom action bar.
 
 <p align="center">
-  <img src="assets/card-preview.png" alt="Miyoo Mini Card preview" width="420" />
+  <img src="assets/card-preview.png" alt="Miyoo Mini Card preview" width="720" />
 </p>
 
 ## Requirements
