@@ -3,17 +3,18 @@ import { svg, type TemplateResult } from "lit";
 /**
  * Stylized portrait illustration of a transparent-smoke Miyoo Mini Plus.
  *
- * Aspect ratio ≈ 3:4. Semi-translucent black shell with a green-tinted PCB
- * hint visible through the lower half, 4 visible screws around the control
- * area, glossy-dome ABXY in classic SNES layout (X blue top / A red right /
- * B yellow bottom / Y green-teal left), classic plus-shape D-pad, a small
- * round function (menu) button between the D-pad and ABXY, SELECT + START
- * pill buttons bottom-center, an angled-slot speaker grille at the
- * bottom-right, and a small status element at the bottom-left.
- *
- * 3D effects: feGaussianBlur drop shadows on the body and on each control,
- * multi-stop radial gradients with bright top-left specular highlights, and
- * a glossy white half-overlay on every action button.
+ * Layered render order — required to read the "ghosted internals" effect:
+ *   1. Ground shadow + body shell (smoke-tinted gradient + drop shadow)
+ *   2. PCB layer visible through lower half (dark green with traces, SMD
+ *      component rectangles, capacitor dots, ribbon cable connector blocks)
+ *   3. Transition band between screen and control area
+ *   4. Six silver Phillips screws
+ *   5. Speaker internal chamber (darker silhouette under the grille)
+ *   6. Button-membrane recess rings (translucent dark circles behind every
+ *      action button)
+ *   7. Controls (D-pad / ABXY / function / SELECT / START) — glossy domes
+ *      pop in vibrant primaries against the dark translucent background
+ *   8. Speaker grille diagonal slots and pulsing charging LED on top
  */
 export function miyooSvg(opts: {
   screenLine1: string;
@@ -23,7 +24,6 @@ export function miyooSvg(opts: {
   return svg`
     <svg viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
-        <!-- Semi-translucent smoke-black shell -->
         <linearGradient id="mmcShell" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stop-color="#3c4048"/>
           <stop offset="8%"   stop-color="#22262c"/>
@@ -32,11 +32,11 @@ export function miyooSvg(opts: {
           <stop offset="100%" stop-color="#181b21"/>
         </linearGradient>
 
-        <!-- PCB hint that bleeds through the lower half of the shell -->
+        <!-- PCB visible through the lower translucent half -->
         <linearGradient id="mmcPCB" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stop-color="#0c2418" stop-opacity="0"/>
-          <stop offset="40%"  stop-color="#0c2a1a" stop-opacity="0.30"/>
-          <stop offset="100%" stop-color="#143a25" stop-opacity="0.45"/>
+          <stop offset="25%"  stop-color="#0c2a1a" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#164028" stop-opacity="0.55"/>
         </linearGradient>
 
         <linearGradient id="mmcShoulder" x1="0" y1="0" x2="0" y2="1">
@@ -44,7 +44,6 @@ export function miyooSvg(opts: {
           <stop offset="100%" stop-color="#06080b"/>
         </linearGradient>
 
-        <!-- Screen vignette + glare -->
         <radialGradient id="mmcScreen" cx="50%" cy="40%" r="80%">
           <stop offset="0%"   stop-color="#14213d"/>
           <stop offset="70%"  stop-color="#0a1322"/>
@@ -55,14 +54,20 @@ export function miyooSvg(opts: {
           <stop offset="55%" stop-color="#ffffff" stop-opacity="0"/>
         </linearGradient>
 
-        <!-- D-pad recess -->
+        <!-- D-pad — slightly translucent matching shell tint -->
         <radialGradient id="mmcDpad" cx="42%" cy="35%" r="75%">
-          <stop offset="0%"   stop-color="#4c525a"/>
-          <stop offset="55%"  stop-color="#1f2228"/>
+          <stop offset="0%"   stop-color="#3a3e46"/>
+          <stop offset="55%"  stop-color="#181b21"/>
           <stop offset="100%" stop-color="#05070a"/>
         </radialGradient>
 
-        <!-- ABXY glossy-dome gradients (specular highlight at upper-left) -->
+        <!-- Translucent black for SELECT / START / function pills -->
+        <linearGradient id="mmcTranslucentBlk" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#2a2e36"/>
+          <stop offset="100%" stop-color="#0a0c10"/>
+        </linearGradient>
+
+        <!-- ABXY glossy-dome gradients with bright top-left specular -->
         <radialGradient id="mmcA" cx="30%" cy="25%" r="80%">
           <stop offset="0%"   stop-color="#fee2e2"/>
           <stop offset="14%"  stop-color="#fca5a5"/>
@@ -97,14 +102,14 @@ export function miyooSvg(opts: {
           <stop offset="55%" stop-color="#ffffff" stop-opacity="0"/>
         </linearGradient>
 
-        <!-- Screw head detail -->
-        <radialGradient id="mmcScrew" cx="40%" cy="35%" r="65%">
-          <stop offset="0%"   stop-color="#6b7077"/>
-          <stop offset="55%"  stop-color="#34383f"/>
-          <stop offset="100%" stop-color="#0d1014"/>
+        <!-- Silver metallic Phillips screw head -->
+        <radialGradient id="mmcScrew" cx="35%" cy="30%" r="70%">
+          <stop offset="0%"   stop-color="#e5e7eb"/>
+          <stop offset="30%"  stop-color="#9ca3af"/>
+          <stop offset="80%"  stop-color="#4b5563"/>
+          <stop offset="100%" stop-color="#1f2937"/>
         </radialGradient>
 
-        <!-- Shadows -->
         <filter id="mmcBodyShadow" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
           <feOffset dx="0" dy="5" result="o"/>
@@ -126,26 +131,70 @@ export function miyooSvg(opts: {
       <rect x="40" y="4"  width="200" height="14" rx="7" fill="url(#mmcShoulder)"/>
       <rect x="42" y="6"  width="196" height="3"  rx="1.5" fill="#000" opacity="0.55"/>
 
-      <!-- Body -->
+      <!-- Body (1) -->
       <g filter="url(#mmcBodyShadow)">
         <rect x="14" y="14" width="252" height="346" rx="26" ry="26"
               fill="url(#mmcShell)" stroke="#000" stroke-width="0.9"/>
-        <!-- PCB hint bleeding through the translucent lower half -->
-        <rect x="18" y="180" width="244" height="178" rx="22"
-              fill="url(#mmcPCB)" opacity="0.85"/>
-        <!-- Top rim highlight -->
         <rect x="18" y="17" width="244" height="2" rx="1" fill="#5c626c" opacity="0.55"/>
-        <!-- Subtle internal "trace" lines visible through smoke -->
-        <g stroke="#1a3a26" stroke-width="0.4" opacity="0.55">
-          <line x1="30"  y1="262" x2="100" y2="262"/>
-          <line x1="170" y1="262" x2="250" y2="262"/>
-          <line x1="60"  y1="300" x2="220" y2="300"/>
-          <line x1="50"  y1="338" x2="80"  y2="338"/>
-          <line x1="200" y1="338" x2="240" y2="338"/>
+        <rect x="18" y="355" width="244" height="2" rx="1" fill="#2a2e35" opacity="0.6"/>
+      </g>
+
+      <!-- PCB layer visible through translucent lower half (2) -->
+      <g>
+        <rect x="20" y="222" width="240" height="132" rx="20" fill="url(#mmcPCB)" opacity="0.95"/>
+
+        <!-- Faint copper/solder-mask trace lines -->
+        <g stroke="#1a3a26" stroke-width="0.5" opacity="0.55" fill="none">
+          <path d="M 30 240 L 90 240 L 95 246 L 130 246"/>
+          <path d="M 165 244 L 200 244 L 210 252 L 250 252"/>
+          <path d="M 40 282 L 80 282"/>
+          <path d="M 200 282 L 245 282"/>
+          <path d="M 28 308 L 90 308 L 100 314 L 175 314 L 185 308 L 248 308"/>
+          <path d="M 30 332 L 70 332"/>
+          <path d="M 90 348 L 195 348"/>
+          <path d="M 210 332 L 248 332"/>
+        </g>
+
+        <!-- Small SMD chips / ICs (rectangular silhouettes) -->
+        <g fill="#0b1e14" opacity="0.85">
+          <rect x="40"  y="232" width="14" height="9" rx="0.5"/>
+          <rect x="222" y="232" width="14" height="9" rx="0.5"/>
+          <rect x="42"  y="294" width="9"  height="6" rx="0.5"/>
+          <rect x="225" y="294" width="9"  height="6" rx="0.5"/>
+          <rect x="120" y="345" width="40" height="7" rx="0.5"/>
+        </g>
+        <!-- Tiny capacitor / resistor dots -->
+        <g fill="#163524" opacity="0.85">
+          <circle cx="60"  cy="246" r="1.4"/>
+          <circle cx="64"  cy="246" r="1.4"/>
+          <circle cx="220" cy="246" r="1.4"/>
+          <circle cx="216" cy="246" r="1.4"/>
+          <circle cx="58"  cy="304" r="1.2"/>
+          <circle cx="220" cy="304" r="1.2"/>
+          <circle cx="120" cy="332" r="1.2"/>
+          <circle cx="160" cy="332" r="1.2"/>
+        </g>
+        <!-- Ribbon-cable connector blocks -->
+        <g fill="#0a1c12" opacity="0.9" stroke="#1f3d28" stroke-width="0.3">
+          <rect x="100" y="232" width="20" height="6" rx="0.5"/>
+          <rect x="160" y="232" width="20" height="6" rx="0.5"/>
+        </g>
+        <g fill="#143424" opacity="0.6">
+          <rect x="102" y="234" width="1.5" height="2"/>
+          <rect x="106" y="234" width="1.5" height="2"/>
+          <rect x="110" y="234" width="1.5" height="2"/>
+          <rect x="114" y="234" width="1.5" height="2"/>
+          <rect x="162" y="234" width="1.5" height="2"/>
+          <rect x="166" y="234" width="1.5" height="2"/>
+          <rect x="170" y="234" width="1.5" height="2"/>
+          <rect x="174" y="234" width="1.5" height="2"/>
         </g>
       </g>
 
-      <!-- Decorative top accent line under shoulder -->
+      <!-- Transition band between screen and controls (3) -->
+      <rect x="14" y="216" width="252" height="10" fill="#0a0d12" opacity="0.65"/>
+
+      <!-- Decorative top accent line -->
       <line x1="50" y1="26" x2="230" y2="26" stroke="#3a3f47" stroke-width="0.7" opacity="0.6"/>
 
       <!-- Screen recess + screen -->
@@ -154,53 +203,59 @@ export function miyooSvg(opts: {
       <rect x="36" y="40" width="208" height="168" rx="4" fill="url(#mmcScreen)"/>
       <rect x="36" y="40" width="208" height="92"  rx="4" fill="url(#mmcScreenGlare)"/>
 
-      <!-- Screen text -->
       <text x="140" y="115" class="mmc-screen-text">${opts.screenLine1}</text>
       <text x="140" y="148" class="mmc-screen-sub">${opts.screenLine2}</text>
 
-      <!-- Four visible Phillips-head screws around the control area -->
-      <g>
-        <g transform="translate(38,234)">
-          <circle r="3.2" fill="url(#mmcScrew)"/>
-          <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#06080b" stroke-width="0.6"/>
-          <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#06080b" stroke-width="0.6"/>
+      <!-- Six silver Phillips screws (4) -->
+      ${[
+        [38, 230], [140, 230], [242, 230],
+        [38, 348], [140, 348], [242, 348],
+      ].map(([cx, cy]) => svg`
+        <g transform="translate(${cx},${cy})">
+          <circle r="4" fill="url(#mmcScrew)"/>
+          <circle r="3.2" fill="none" stroke="#0a0c10" stroke-width="0.4"/>
+          <line x1="-2.4" y1="0" x2="2.4" y2="0" stroke="#0a0c10" stroke-width="0.7"/>
+          <line x1="0" y1="-2.4" x2="0" y2="2.4" stroke="#0a0c10" stroke-width="0.7"/>
         </g>
-        <g transform="translate(242,234)">
-          <circle r="3.2" fill="url(#mmcScrew)"/>
-          <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#06080b" stroke-width="0.6"/>
-          <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#06080b" stroke-width="0.6"/>
-        </g>
-        <g transform="translate(38,332)">
-          <circle r="3.2" fill="url(#mmcScrew)"/>
-          <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#06080b" stroke-width="0.6"/>
-          <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#06080b" stroke-width="0.6"/>
-        </g>
-        <g transform="translate(242,332)">
-          <circle r="3.2" fill="url(#mmcScrew)"/>
-          <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#06080b" stroke-width="0.6"/>
-          <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#06080b" stroke-width="0.6"/>
-        </g>
+      `)}
+
+      <!-- Speaker internal chamber visible behind grille (5) -->
+      <rect x="195" y="338" width="48" height="20" rx="3" fill="#020405" opacity="0.85"/>
+      <circle cx="219" cy="348" r="9" fill="#06080b" opacity="0.9"/>
+      <circle cx="219" cy="348" r="5" fill="#10131a" opacity="0.85"/>
+
+      <!-- Button-membrane recess rings (6) — translucent dark behind ABXY -->
+      <g transform="translate(216,270)" opacity="0.7">
+        <circle cx="0"   cy="-28" r="18" fill="#0a0d12"/>
+        <circle cx="28"  cy="0"   r="18" fill="#0a0d12"/>
+        <circle cx="0"   cy="28"  r="18" fill="#0a0d12"/>
+        <circle cx="-28" cy="0"   r="18" fill="#0a0d12"/>
+      </g>
+      <!-- D-pad recess outline -->
+      <g transform="translate(64,270)" opacity="0.45">
+        <rect x="-36" y="-36" width="72" height="72" rx="10" fill="#0a0d12"/>
       </g>
 
-      <!-- D-pad (left) -->
+      <!-- D-pad (7a) -->
       <g transform="translate(64,270)" filter="url(#mmcBtnShadow)">
         <rect x="-11" y="-32" width="22" height="64" rx="4" fill="url(#mmcDpad)"/>
         <rect x="-32" y="-11" width="64" height="22" rx="4" fill="url(#mmcDpad)"/>
-        <rect x="-9"  y="-30" width="18" height="1.5" rx="0.75" fill="#5e646d" opacity="0.7"/>
-        <rect x="-30" y="-9"  width="60" height="1.5" rx="0.75" fill="#5e646d" opacity="0.7"/>
+        <rect x="-9"  y="-30" width="18" height="1.5" rx="0.75" fill="#4a4f57" opacity="0.7"/>
+        <rect x="-30" y="-9"  width="60" height="1.5" rx="0.75" fill="#4a4f57" opacity="0.7"/>
         <circle cx="0" cy="0" r="4.5" fill="#03050a"/>
         <circle cx="0" cy="0" r="3"   fill="#10131a" opacity="0.9"/>
       </g>
 
-      <!-- Function (menu) button — small round, top-center between D-pad and ABXY -->
-      <g transform="translate(140,245)" filter="url(#mmcBtnShadow)">
-        <circle r="7" fill="#1a1c20" stroke="#06080b" stroke-width="0.5"/>
-        <circle r="7" fill="url(#mmcBtnGloss)"/>
+      <!-- Function (MENU) button — translucent black (7b) -->
+      <g transform="translate(140,250)" filter="url(#mmcBtnShadow)">
+        <circle r="9"   fill="#000" opacity="0.55"/>
+        <circle r="7.5" fill="url(#mmcTranslucentBlk)" stroke="#06080b" stroke-width="0.4"/>
+        <circle r="7.5" fill="url(#mmcBtnGloss)" opacity="0.35"/>
         <text y="3" text-anchor="middle" font-family="sans-serif" font-size="6"
-              font-weight="700" fill="#9aa0aa" opacity="0.95">M</text>
+              font-weight="700" fill="#9aa0aa" opacity="0.9">M</text>
       </g>
 
-      <!-- ABXY diamond (right). X top blue / Y left green-teal / A right red / B bottom yellow -->
+      <!-- ABXY diamond (7c) -->
       <g transform="translate(216,270)" filter="url(#mmcBtnShadow)">
         <circle cx="0"   cy="-28" r="15" fill="url(#mmcX)"/>
         <circle cx="0"   cy="-28" r="15" fill="url(#mmcBtnGloss)"/>
@@ -223,34 +278,28 @@ export function miyooSvg(opts: {
               font-size="11" font-weight="700" fill="#ffffff" opacity="0.9">Y</text>
       </g>
 
-      <!-- SELECT + START pills (bottom-center, just two of them) -->
-      <g transform="translate(140,316)">
+      <!-- SELECT + START translucent pills (7d) -->
+      <g transform="translate(140,318)">
         <g filter="url(#mmcBtnShadow)">
-          <rect x="-46" y="-6" width="40" height="12" rx="6" fill="#1a1c20"/>
-          <rect x="6"   y="-6" width="40" height="12" rx="6" fill="#1a1c20"/>
-          <rect x="-45" y="-5" width="38" height="1" rx="0.5" fill="#4a5058" opacity="0.7"/>
-          <rect x="7"   y="-5" width="38" height="1" rx="0.5" fill="#4a5058" opacity="0.7"/>
+          <rect x="-46" y="-7" width="40" height="14" rx="7" fill="url(#mmcTranslucentBlk)" stroke="#06080b" stroke-width="0.4"/>
+          <rect x="6"   y="-7" width="40" height="14" rx="7" fill="url(#mmcTranslucentBlk)" stroke="#06080b" stroke-width="0.4"/>
+          <rect x="-45" y="-6" width="38" height="2" rx="1" fill="#ffffff" opacity="0.10"/>
+          <rect x="7"   y="-6" width="38" height="2" rx="1" fill="#ffffff" opacity="0.10"/>
         </g>
         <g fill="#a8aeb8" font-family="sans-serif" font-size="6.5" text-anchor="middle"
            letter-spacing="0.8" font-weight="600">
-          <text x="-26" y="2">SELECT</text>
-          <text x="26"  y="2">START</text>
+          <text x="-26" y="3">SELECT</text>
+          <text x="26"  y="3">START</text>
         </g>
       </g>
 
-      <!-- Small status element bottom-left (power/reset indicator) -->
-      <g transform="translate(60,348)">
-        <rect x="-12" y="-3" width="24" height="6" rx="1.5" fill="#06080b"/>
-        <rect x="-10" y="-2" width="20" height="1" rx="0.5" fill="#2a2e35" opacity="0.8"/>
-      </g>
-
-      <!-- Speaker grille bottom-right — angled parallel slots -->
+      <!-- Speaker grille diagonal slots (8) -->
       <g transform="translate(220,348)" stroke="#06080b" stroke-width="1.6" stroke-linecap="round">
-        <line x1="-18" y1="4"  x2="-2"  y2="-4"/>
-        <line x1="-12" y1="4"  x2="4"   y2="-4"/>
-        <line x1="-6"  y1="4"  x2="10"  y2="-4"/>
-        <line x1="0"   y1="4"  x2="16"  y2="-4"/>
-        <line x1="6"   y1="4"  x2="22"  y2="-4"/>
+        <line x1="-20" y1="6"  x2="-4"  y2="-6"/>
+        <line x1="-14" y1="6"  x2="2"   y2="-6"/>
+        <line x1="-8"  y1="6"  x2="8"   y2="-6"/>
+        <line x1="-2"  y1="6"  x2="14"  y2="-6"/>
+        <line x1="4"   y1="6"  x2="20"  y2="-6"/>
       </g>
 
       <!-- Charging LED on shoulder strip -->
