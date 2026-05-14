@@ -1,5 +1,5 @@
 export const CARD_NAME = "miyoo-mini-card";
-export const CARD_VERSION = "0.2.0";
+export const CARD_VERSION = "0.2.1";
 
 // All the data points the card knows how to render. These are *logical*
 // keys — the entity ID is derived from `<prefix>_<key>` (or overridden

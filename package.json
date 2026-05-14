@@ -1,6 +1,6 @@
 {
   "name": "miyoo-mini-card",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Lovelace card for Miyoo Mini Plus via miyoo-mqtt-reporter MQTT integration",
   "type": "module",
   "main": "dist/miyoo-mini-card.js",
