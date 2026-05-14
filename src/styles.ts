@@ -51,22 +51,23 @@ export const cardStyles = css`
   .mmc-photo {
     position: relative;
     width: 100%;
-    max-width: 260px;
+    max-width: 240px;
     line-height: 0;
   }
   .mmc-photo-img {
     width: 100%;
     height: auto;
     display: block;
+    color: #666; /* fallback for currentColor in SVG, if needed */
   }
-  /* Overlay positioned over the screen region of the photo.
-     Tuned for the cropped 218×300 product shot. */
+  /* Overlay maps to the SVG screen rect: viewBox (42,56) → (198,192),
+     viewBox is 240×400. Percentages computed from those bounds. */
   .mmc-screen-overlay {
     position: absolute;
-    top: 7.5%;
-    bottom: 53%;
-    left: 14%;
-    right: 14%;
+    top: 14%;     /* 56/400  */
+    bottom: 52%;  /* (400-192)/400 */
+    left: 17.5%;  /* 42/240  */
+    right: 17.5%; /* (240-198)/240 */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -76,25 +77,26 @@ export const cardStyles = css`
     line-height: 1.2;
   }
   .mmc-screen-line1 {
-    color: #fff;
-    font: 700 14px sans-serif;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    color: var(--mmc-fg);
+    font: 700 13px sans-serif;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   .mmc-screen-line2 {
-    color: #94a3b8;
+    color: var(--mmc-muted);
     font: 500 10px sans-serif;
     letter-spacing: 1px;
     margin-top: 4px;
   }
+  /* Animated charging LED — sits over the static power-LED dot
+     drawn in the SVG at viewBox (206,26) → ~86% / 6.5%. */
   .mmc-led-charging {
     position: absolute;
-    top: 2.5%;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 5%;
+    left: 86%;
+    transform: translate(-50%, -50%);
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -103,8 +105,8 @@ export const cardStyles = css`
     animation: mmc-pulse 1.6s ease-in-out infinite;
   }
   @keyframes mmc-pulse {
-    0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
-    50%      { opacity: 1.0; transform: translateX(-50%) scale(1.3); }
+    0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+    50%      { opacity: 1.0; transform: translate(-50%, -50%) scale(1.3); }
   }
 
   /* ── Device name + status line ────────────────────────────────────── */
