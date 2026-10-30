@@ -1,19 +1,19 @@
-import { LitElement, html, nothing, type TemplateResult } from "lit";
+import { LitElement, html, nothing, type PropertyValues, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { CARD_NAME, CARD_VERSION } from "./const";
 import { cardStyles } from "./styles";
 import { miyooDevice } from "./assets/miyoo-device";
-import { resolveEntities } from "./helpers/resolve-entities";
+import { resolveEntities, suggestPrefix } from "./helpers/resolve-entities";
 import { computeStateLine } from "./helpers/compute-state-line";
 import { formatStat } from "./helpers/format-stat";
 import { localize } from "./localize";
 import type {
   HassObject,
+  HassState,
   MiyooMiniCardConfig,
   ResolvedEntities,
   StatConfig,
 } from "./types";
-import "./editor";
 
 console.info(
   `%c MIYOO-MINI-CARD %c v${CARD_VERSION} `,
@@ -22,7 +22,7 @@ console.info(
 );
 
 interface CustomCardWindow extends Window {
-  customCards?: Array<{ type: string; name: string; description: string; preview: boolean }>;
+  customCards?: Array<Record<string, unknown>>;
 }
 const w = window as CustomCardWindow;
 w.customCards = w.customCards || [];
@@ -31,6 +31,12 @@ w.customCards.push({
   name: "Miyoo Mini Card",
   description: "Card for Miyoo Mini Plus via miyoo-mqtt-reporter MQTT integration",
   preview: false,
+  documentationURL: "https://github.com/hudsonbrendon/miyoo-mini-card",
+  // Offer this card when the user picks the device's MQTT battery sensor.
+  getEntitySuggestion: (hass: HassObject, entityId: string) => {
+    const prefix = suggestPrefix(hass, entityId);
+    return prefix ? { config: { type: `custom:${CARD_NAME}`, entity: prefix } } : null;
+  },
 });
 
 const DEFAULT_STATS: StatConfig[] = [
@@ -67,8 +73,39 @@ export class MiyooMiniCard extends LitElement {
     return 5;
   }
 
-  static getConfigElement(): HTMLElement {
-    return document.createElement("miyoo-mini-card-editor");
+  static getConfigForm() {
+    return {
+      schema: [
+        { name: "entity", required: true, selector: { text: {} } },
+        { name: "name", selector: { text: {} } },
+        { name: "language", selector: { select: { options: ["en", "pt-BR"], mode: "dropdown" } } },
+      ],
+      computeLabel: (schema: { name: string }) => localize(`editor.${schema.name}`),
+    };
+  }
+
+  getGridOptions() {
+    return { columns: 6, rows: 5, min_columns: 4, min_rows: 4 };
+  }
+
+  protected willUpdate(changed: PropertyValues): void {
+    if (changed.has("hass")) {
+      this.toggleAttribute("dark-mode", Boolean(this.hass?.themes?.darkMode));
+    }
+  }
+
+  // Plain stats (no unit/multiply/precision/suffix) use HA's locale-aware
+  // formatting when available; everything else keeps the card's formatStat.
+  private _displayStat(stateObj: HassState | undefined, s: StatConfig): string {
+    const plain = !s.unit && !s.multiply && s.precision === undefined && !s.suffix;
+    if (plain && stateObj && this.hass?.formatEntityState && !["unknown", "unavailable", ""].includes(stateObj.state)) {
+      try {
+        return this.hass.formatEntityState(stateObj);
+      } catch {
+        /* fall through */
+      }
+    }
+    return formatStat(stateObj, s);
   }
 
   static getStubConfig(): MiyooMiniCardConfig {
@@ -196,7 +233,7 @@ export class MiyooMiniCard extends LitElement {
             const v = id ? this.hass!.states[id] : undefined;
             return html`
               <div class="mmc-stat">
-                <div class="mmc-stat-val">${formatStat(v, s)}</div>
+                <div class="mmc-stat-val">${this._displayStat(v, s)}</div>
                 <div class="mmc-stat-sub">${localize(s.subtitle, lang)}</div>
               </div>
             `;

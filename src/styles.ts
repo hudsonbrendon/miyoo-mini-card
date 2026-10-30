@@ -108,6 +108,9 @@ export const cardStyles = css`
     0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
     50%      { opacity: 1.0; transform: translate(-50%, -50%) scale(1.3); }
   }
+  @media (prefers-reduced-motion: reduce) {
+    .mmc-led-charging { animation: none; }
+  }
 
   /* ── Device name + status line ────────────────────────────────────── */
   .mmc-name {
