@@ -14,4 +14,7 @@ export const ptBR: Record<string, string> = {
   "stat.wifi": "Wi-Fi",
   "stat.playtime_today": "Hoje",
   "stat.ram": "RAM",
+  "editor.entity": "Prefixo das entidades (slug do dispositivo)",
+  "editor.name": "Nome",
+  "editor.language": "Idioma",
 };

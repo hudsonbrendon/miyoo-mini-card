@@ -14,4 +14,7 @@ export const en: Record<string, string> = {
   "stat.wifi": "Wi-Fi",
   "stat.playtime_today": "Today",
   "stat.ram": "RAM",
+  "editor.entity": "Entity prefix (device slug)",
+  "editor.name": "Name",
+  "editor.language": "Language",
 };
